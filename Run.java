@@ -1,3 +1,4 @@
+import acm.graphics.GLabel;
 import acm.graphics.GObject;
 import acm.graphics.GOval;
 import acm.graphics.GRect;
@@ -14,6 +15,8 @@ public class Run extends GraphicsProgram {
     /** Width and height of application window in pixels */
     public static final int APPLICATION_WIDTH = 400;
     public static final int APPLICATION_HEIGHT = 600;
+    /**Counter for lives*/
+    public static int NUMBER_OF_LIVES = 3;
 
     /** Dimensions of game board (usually the same) */
     private static final int WIDTH = APPLICATION_WIDTH;
@@ -50,9 +53,12 @@ public class Run extends GraphicsProgram {
 
     /** Number of turns */
     private static final int NTURNS = 3;
+  
     private GOval ball;
     private GRect brick;
     private GRect paddle;
+    private GLabel gameOver = new GLabel("GAME OVER", 100, 200);
+	   
     /** how fast ball is moving */
     private double vx, vy;
     /** random generator */
@@ -66,8 +72,12 @@ public class Run extends GraphicsProgram {
 
     }
        private void setUp(){
+    	   
             this.setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
             createBricks(getWidth() / 2, BRICK_Y_OFFSET);
+            gameOver.setColor(Color.RED);
+     	   gameOver.setVisible(true);
+     	
            newPaddle();
            setupBall();
            jumpBall();
@@ -108,11 +118,18 @@ public class Run extends GraphicsProgram {
 
     }
     private void jumpBall() {
+    	
         while (true) {
             ballMove();
             checkWall();
             checkForCollisions();
             waitForFewTime();
+            if (NUMBER_OF_LIVES<=0){
+            	
+          	add(gameOver);
+            	break;
+            }
+            
         }
 
     }
@@ -132,7 +149,7 @@ public class Run extends GraphicsProgram {
     }
     /**creating ball*/
     private void setupBall() {
-        ball = new GOval(getWidth() / 2 - BALL_RADIUS, getHeight() / 2 - BALL_RADIUS, BALL_RADIUS, BALL_RADIUS);
+        ball = new GOval(APPLICATION_WIDTH / 2 - BALL_RADIUS, APPLICATION_HEIGHT/ 3 - BALL_RADIUS*2, BALL_RADIUS, BALL_RADIUS);
         ball.setFilled(true);
         add(ball);
         vx = rgen.nextDouble(1.0, 3.0);
@@ -156,30 +173,28 @@ public class Run extends GraphicsProgram {
     /** check touching wall */
     private void checkWall() {
 		/*
-		 * ���������� ��� ������������� ��������� ����, ���� �� ������� �������
-		 * ������
+		 * змінна для корекції позиції м`яча
 		 */
         double diff;
-		/* �������� �� �������� �� ��� ���� */
+		/* перевірка на торкання полу*/
         if (ball.getY() > getHeight() - BALL_RADIUS) {
-            vy = -vy;
-            diff = ball.getY() - (getHeight() - BALL_RADIUS);
-            ball.move(0, -2 * diff);
-
+        	remove(ball);
+            setupBall();
+            NUMBER_OF_LIVES--;
         }
-		/* ��������, �� �������� �� ��� ������� */
+		/* перевірка на торкання стелі */
         if (ball.getY() < BALL_RADIUS) {
             vy = -vy;
             diff = ball.getY() + BALL_RADIUS;
             ball.move(0, 2 * diff);
         }
-		/* ��������, �� �������� �� ��� ������ ����� */
+		/* перевірка на торкання правої стіни*/
         if (ball.getX() > getWidth() - BALL_RADIUS) {
             vx = -vx;
             diff = ball.getX() - (getWidth() - BALL_RADIUS);
             ball.move(-2 * diff, 0);
         }
-		/* �������� �� �������� �� ��� ����� ����� */
+		/* перевірка на торкання лівої стіни */
         if (ball.getX() < BALL_RADIUS) {
             vx = -vx;
             diff = ball.getX() + BALL_RADIUS;
