@@ -1,7 +1,4 @@
-import acm.graphics.GLabel;
-import acm.graphics.GObject;
-import acm.graphics.GOval;
-import acm.graphics.GRect;
+import acm.graphics.*;
 import acm.program.GraphicsProgram;
 import acm.util.RandomGenerator;
 
@@ -53,11 +50,12 @@ public class Run extends GraphicsProgram {
 	/** Number of turns */
 	private static final int NTURNS = 3;
 
+    private int counter = 0;
 	private GOval ball;
 	private GRect brick;
 	private GRect paddle;
 	private GLabel gameOver = new GLabel("GAME OVER", 100, 200);
-	private GLabel lives = new GLabel(NUMBER_OF_LIVES + "", 10, 20);
+	private GLabel lives = new GLabel("LIVES: " + NUMBER_OF_LIVES + "", 10, 20);
 
 	/** how fast ball is moving */
 	private double vx, vy;
@@ -76,7 +74,6 @@ public class Run extends GraphicsProgram {
 		createBricks(getWidth() / 2, BRICK_Y_OFFSET);
 		gameOver.setColor(Color.RED);
 		gameOver.setVisible(true);
-		GLabel lives = new GLabel(3 + "", 10, 20);
 		add(lives);
 		
 		newPaddle();
@@ -114,10 +111,11 @@ public class Run extends GraphicsProgram {
 					brick.setColor(Color.cyan);
 				}
 				add(brick);
+                counter ++;
 			}
 		}
-
-	}
+            System.out.println(counter);
+        }
 
 	private void jumpBall() {
 
@@ -127,10 +125,14 @@ public class Run extends GraphicsProgram {
 			checkForCollisions();
 			waitForFewTime();
 			if (NUMBER_OF_LIVES <= 0) {
-
 				add(gameOver);
 				break;
 			}
+            if( counter == 0){
+                GLabel winner = new GLabel("WINNER!!!",100,200);
+                add(winner);
+                break;
+            }
 
 		}
 
@@ -144,9 +146,11 @@ public class Run extends GraphicsProgram {
 				vy = -vy;
 			} else {
 				remove(collider);
+                counter --;
 				vy = -vy;
 			}
 		}
+        System.out.println(counter);
 
 	}
 
@@ -187,7 +191,7 @@ public class Run extends GraphicsProgram {
 			setupBall();
 			
 			NUMBER_OF_LIVES--;
-			lives.setLabel(NUMBER_OF_LIVES+"");
+			lives.setLabel("LIVES: " + NUMBER_OF_LIVES + "");
 			add(lives);
 			
 			
